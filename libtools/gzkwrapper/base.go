@@ -132,7 +132,6 @@ type NodeMapper struct {
 }
 
 func NewNodeMapper() *NodeMapper {
-
 	return &NodeMapper{
 		keys:  make([]string, 0),
 		items: make(map[string]*NodeData),

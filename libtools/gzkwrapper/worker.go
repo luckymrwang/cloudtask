@@ -1,13 +1,12 @@
 package gzkwrapper
 
-import "cloudtask/libtools/gounits/network"
-import "github.com/samuel/go-zookeeper/zk"
-
 import (
 	"errors"
 	"os"
 	"strings"
 	"time"
+
+	"cloudtask/libtools/gounits/network"
 )
 
 type WorkerArgs struct {
@@ -36,7 +35,6 @@ type Worker struct {
 }
 
 func NewWorker(key string, args *WorkerArgs, handler INodeNotifyHandler) (*Worker, error) {
-
 	if len(strings.TrimSpace(key)) == 0 {
 		return nil, ErrKeyInvalid
 	}
@@ -74,7 +72,6 @@ func NewWorker(key string, args *WorkerArgs, handler INodeNotifyHandler) (*Worke
 }
 
 func (w *Worker) Open() error {
-
 	if w.Node != nil {
 		err := w.Node.Open()
 		if err == nil {
@@ -93,7 +90,6 @@ func (w *Worker) Open() error {
 }
 
 func (w *Worker) Close() error {
-
 	if w.Node != nil {
 		w.pulseAlive = false
 		if w.stopCh != nil {
@@ -107,7 +103,6 @@ func (w *Worker) Close() error {
 }
 
 func (w *Worker) Server() string {
-
 	if w.Node != nil {
 		return w.Node.Server()
 	}
@@ -115,7 +110,6 @@ func (w *Worker) Server() string {
 }
 
 func (w *Worker) State() string {
-
 	if w.Node != nil {
 		return w.Node.State()
 	}
@@ -123,7 +117,6 @@ func (w *Worker) State() string {
 }
 
 func (w *Worker) SetPulse(value string) error {
-
 	pulse, err := time.ParseDuration(value)
 	if err != nil {
 		return err
@@ -133,67 +126,54 @@ func (w *Worker) SetPulse(value string) error {
 }
 
 func (w *Worker) GetLocation() string {
-
 	return w.Data.Location
 }
 
 func (w *Worker) GetOS() string {
-
 	return w.Data.OS
 }
 
 func (w *Worker) GetPlatform() string {
-
 	return w.Data.Platform
 }
 
 func (w *Worker) WatchOpen(path string, callback WatchHandlerFunc) error {
-
 	return w.Node.WatchOpen(path, callback)
 }
 
 func (w *Worker) WatchClose(path string) {
-
 	w.Node.WatchClose(path)
 }
 
 func (w *Worker) Exists(path string) (bool, error) {
-
 	return w.Node.Exists(path)
 }
 
 func (w *Worker) Children(path string) ([]string, error) {
-
 	return w.Node.Children(path)
 }
 
 func (w *Worker) Get(path string) ([]byte, error) {
-
 	return w.Node.Get(path)
 }
 
 func (w *Worker) Create(path string, buffer []byte) error {
-
 	return w.Node.Create(path, buffer)
 }
 
 func (w *Worker) Remove(path string) error {
-
 	return w.Node.Remove(path)
 }
 
 func (w *Worker) Set(path string, buffer []byte) error {
-
 	return w.Node.Set(path, buffer)
 }
 
 func (w *Worker) SetAttach(attach []byte) {
-
 	w.Data.Attach = attach
 }
 
 func (w *Worker) Signin(attach []byte) error {
-
 	if w.Node == nil {
 		return ErrNodeIsNull
 	}
@@ -229,7 +209,6 @@ func (w *Worker) Signin(attach []byte) error {
 }
 
 func (w *Worker) Signout() error {
-
 	if w.Node == nil {
 		return ErrNodeIsNull
 	}
@@ -248,7 +227,6 @@ func (w *Worker) Signout() error {
 }
 
 func (w *Worker) pulseKeepAlive() {
-
 NEW_TICK_DURATION:
 	ticker := time.NewTicker(w.Pulse)
 	for {
@@ -271,13 +249,13 @@ NEW_TICK_DURATION:
 				}
 				err = w.Node.Set(w.Path, buffer)
 				if err != nil {
-					if err == zk.ErrNoNode {
-						if er := w.Node.Create(w.Path, buffer); er != nil {
-							err = errors.New("create worker error, " + er.Error())
-						}
-					} else {
-						err = errors.New("set worker error, " + err.Error())
-					}
+					//if err == zk.ErrNoNode {
+					//	if er := w.Node.Create(w.Path, buffer); er != nil {
+					//		err = errors.New("create worker error, " + er.Error())
+					//}
+					//} else {
+					err = errors.New("set worker error, " + err.Error())
+					//}
 				}
 				w.Handler.OnZkWrapperPulseHandlerFunc(w.Key, w.Data, err)
 			}

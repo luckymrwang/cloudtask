@@ -11,7 +11,6 @@ type SuspicionMapper struct {
 }
 
 func NewSuspicionMapper() *SuspicionMapper {
-
 	return &SuspicionMapper{
 		mutex: new(sync.RWMutex),
 		items: make(map[string]int64),
@@ -19,7 +18,6 @@ func NewSuspicionMapper() *SuspicionMapper {
 }
 
 func (mapper *SuspicionMapper) Get(key string) int64 {
-
 	mapper.mutex.RLock()
 	defer mapper.mutex.RUnlock()
 	if _, ret := mapper.items[key]; ret {
@@ -29,7 +27,6 @@ func (mapper *SuspicionMapper) Get(key string) int64 {
 }
 
 func (mapper *SuspicionMapper) Add(key string) int {
-
 	mapper.mutex.Lock()
 	defer mapper.mutex.Unlock()
 	if _, ret := mapper.items[key]; !ret {
@@ -40,7 +37,6 @@ func (mapper *SuspicionMapper) Add(key string) int {
 }
 
 func (mapper *SuspicionMapper) Del(key string) int {
-
 	mapper.mutex.Lock()
 	defer mapper.mutex.Unlock()
 	if _, ret := mapper.items[key]; ret {
@@ -51,7 +47,6 @@ func (mapper *SuspicionMapper) Del(key string) int {
 }
 
 func (mapper *SuspicionMapper) Clear() {
-
 	mapper.mutex.Lock()
 	defer mapper.mutex.Unlock()
 	for key := range mapper.items {

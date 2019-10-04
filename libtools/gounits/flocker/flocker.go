@@ -21,7 +21,6 @@ type FileLocker struct {
 }
 
 func NewFileLocker(fname string, wait time.Duration) *FileLocker {
-
 	return &FileLocker{
 		FileName: fname,
 		Wait:     wait,

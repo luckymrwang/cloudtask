@@ -1,67 +1,55 @@
 package gzkwrapper
 
-import "github.com/samuel/go-zookeeper/zk"
-
 import (
-	"errors"
+	"context"
 	"time"
+
+	"go.etcd.io/etcd/clientv3"
 )
 
 const RetryInterval time.Duration = time.Second * 5
 
 type WatchObject struct {
-	Path string
-	exit chan bool
+	Watcher clientv3.Watcher
+	Path    string
+	exit    chan bool
 }
 
-func CreateWatchObject(path string, conn *zk.Conn, callback WatchHandlerFunc) *WatchObject {
-
+func CreateWatchObject(path string, conn *Client, callback WatchHandlerFunc) *WatchObject {
 	if conn == nil {
 		return nil
 	}
 
-	watchobject := &WatchObject{
-		Path: path,
-		exit: make(chan bool),
+	watchObject := &WatchObject{
+		Watcher: clientv3.NewWatcher(conn.Client),
+		Path:    path,
+		exit:    make(chan bool),
 	}
 
-	go func(wo *WatchObject, c *zk.Conn, fn WatchHandlerFunc) {
+	go func(wo *WatchObject, c *Client, fn WatchHandlerFunc) {
 		listen := true
 		for listen {
-			ret, _, ev, err := c.ExistsW(wo.Path)
-			if err != nil {
-				if callback != nil {
-					callback(wo.Path, nil, err)
-				}
-				time.Sleep(RetryInterval)
-				continue
-			}
-
+			watchChan := wo.Watcher.Watch(context.TODO(), wo.Path)
 			select {
-			case <-ev:
-				{
-					if ret {
-						go func() {
-							data, _, err := c.Get(wo.Path)
+			case <-watchChan:
+				go func() {
+					for val := range watchChan {
+						for _, event := range val.Events {
 							if callback != nil {
-								callback(wo.Path, data, err)
+								callback(wo.Path, event.Kv.Value, nil)
 							}
-						}()
-					} else {
-						if callback != nil {
-							callback(wo.Path, nil, errors.New("watch exists not found."))
 						}
-						time.Sleep(RetryInterval)
 					}
-				}
+				}()
 			case <-wo.exit:
 				{
 					listen = false
 				}
 			}
 		}
-	}(watchobject, conn, callback)
-	return watchobject
+	}(watchObject, conn, callback)
+
+	return watchObject
 }
 
 /*
@@ -123,9 +111,9 @@ func CreateWatchObject(path string, conn *zk.Conn, callback WatchHandlerFunc) *W
 }
 */
 func ReleaseWatchObject(wo *WatchObject) {
-
 	if wo != nil {
 		wo.exit <- true
-		close(wo.exit)
+		//close(wo.exit)
+		wo.Watcher.Close()
 	}
 }

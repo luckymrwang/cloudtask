@@ -20,7 +20,6 @@ type AttachData struct {
 }
 
 func AttachEncode(attach *AttachData) []byte {
-
 	buffer := attach_pool.Get().(*bytes.Buffer)
 	buffer.Reset()
 	defer attach_pool.Put(buffer)
@@ -31,7 +30,6 @@ func AttachEncode(attach *AttachData) []byte {
 }
 
 func AttachDecode(data []byte) *AttachData {
-
 	attach := &AttachData{}
 	if err := json.NewDecoder(bytes.NewReader(data)).Decode(attach); err != nil {
 		return &AttachData{}

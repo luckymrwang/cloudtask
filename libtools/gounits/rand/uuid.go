@@ -23,7 +23,6 @@ func UUID(random bool) string {
 
 // WriteUUIDToFile return a uuid string and write to file
 func UUIDFile(fpath string) (string, error) {
-
 	_, err := os.Stat(fpath)
 	if err != nil && !os.IsExist(err) {
 		key := uuid.New().String()
@@ -48,5 +47,6 @@ func UUIDFile(fpath string) (string, error) {
 	if _, err := uuid.Parse(key); err != nil {
 		return "", err
 	}
+
 	return key, nil
 }

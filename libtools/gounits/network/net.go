@@ -154,7 +154,6 @@ func Interfaces() ([]InterfaceStat, error) {
 }
 
 func GetLocalNetDeviceInfo(name string) (*AddrInfo, error) {
-
 	addrs, err := GetLocalNetAddrs()
 	if err != nil {
 		return nil, err

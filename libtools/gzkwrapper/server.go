@@ -1,12 +1,12 @@
 package gzkwrapper
 
-import "cloudtask/libtools/gounits/network"
-
 import (
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"cloudtask/libtools/gounits/network"
 )
 
 type ServerArgs struct {
@@ -38,7 +38,6 @@ type Server struct {
 }
 
 func NewServer(key string, args *ServerArgs, handler INodeNotifyHandler) (*Server, error) {
-
 	if len(strings.TrimSpace(key)) == 0 {
 		return nil, ErrKeyInvalid
 	}
@@ -84,7 +83,6 @@ func NewServer(key string, args *ServerArgs, handler INodeNotifyHandler) (*Serve
 }
 
 func (s *Server) Open() error {
-
 	if s.Node != nil {
 		err := s.Node.Open()
 		if err == nil {
