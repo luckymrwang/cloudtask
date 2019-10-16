@@ -3,6 +3,7 @@ package gzkwrapper
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -129,18 +130,27 @@ func (n *Node) Exists(path string) (bool, error) {
 	return true, nil
 }
 
-// TODO:
 func (n *Node) Children(path string) ([]string, error) {
 	if n.Conn == nil {
 		return nil, ErrNodeConnInvalid
 	}
 
-	//v, _, err := n.Conn.Children(path)
-	//if err != nil {
-	//	return nil, err
-	//}
-	v := make([]string, 0)
-	return v, nil
+	resp, err := n.Conn.Get(path, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
+	}
+
+	children := make([]string, 0)
+	for _, ev := range resp.Kvs {
+		key := string(ev.Key)
+		if key == path {
+			continue
+		}
+
+		children = append(children, strings.TrimPrefix(key, path+"/"))
+	}
+
+	return children, nil
 }
 
 func (n *Node) Get(path string) ([]byte, error) {
@@ -148,11 +158,12 @@ func (n *Node) Get(path string) ([]byte, error) {
 		return nil, ErrNodeConnInvalid
 	}
 
+	fmt.Println("node get start...", path)
 	resp, err := n.Conn.Get(path)
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println("node get end...", resp.Kvs)
 	return resp.Kvs[0].Value, nil
 }
 

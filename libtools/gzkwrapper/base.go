@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"runtime"
 	"strings"
 	"sync"
@@ -212,6 +213,7 @@ func (mapper *NodeMapper) Append(key string, value *NodeData) int {
 		return -1
 	}
 
+	fmt.Println("Nodekv:", key, value.IpAddr)
 	mapper.Lock()
 	defer mapper.Unlock()
 	if _, ret := mapper.items[key]; !ret {

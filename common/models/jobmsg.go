@@ -53,14 +53,12 @@ type MessageCache struct {
 }
 
 func NewMessageCache() *MessageCache {
-
 	return &MessageCache{
 		Data: make(map[string]int64, 0),
 	}
 }
 
 func (mc *MessageCache) ValidateMessage(message interface{}) bool {
-
 	switch msgval := message.(type) {
 	case *JobExecute:
 		return mc.pressMessage(msgval.MsgName+"-"+msgval.JobId, msgval.Timestamp)
@@ -71,7 +69,6 @@ func (mc *MessageCache) ValidateMessage(message interface{}) bool {
 }
 
 func (mc *MessageCache) pressMessage(key string, timestamp int64) bool {
-
 	mc.Lock()
 	defer mc.Unlock()
 	if value, ret := mc.Data[key]; ret {

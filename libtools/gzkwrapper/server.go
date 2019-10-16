@@ -302,7 +302,7 @@ func (s *Server) RefreshCache() error {
 	if nodeStore.TotalSize() > 0 {
 		s.Handler.OnZkWrapperNodeHandlerFunc(nodeStore)
 	}
-	s.refcache.Clear()
+	// s.refcache.Clear()
 	return nil
 }
 
