@@ -262,5 +262,4 @@ NEW_TICK_DURATION:
 			goto NEW_TICK_DURATION
 		}
 	}
-	w.pulseAlive = false
 }

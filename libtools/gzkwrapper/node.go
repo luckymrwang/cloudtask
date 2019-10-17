@@ -83,7 +83,7 @@ func (n *Node) Server() string {
 func (n *Node) State() string {
 	if n.Conn != nil {
 		//return n.Conn.State().String()
-		return ""
+		return "ok"
 	}
 
 	return ""
@@ -164,7 +164,12 @@ func (n *Node) Get(path string) ([]byte, error) {
 		return nil, err
 	}
 	fmt.Println("node get end...", resp.Kvs)
-	return resp.Kvs[0].Value, nil
+
+	ret := make([]byte, 0)
+	if len(resp.Kvs) > 0 {
+		ret = resp.Kvs[0].Value
+	}
+	return ret, nil
 }
 
 func (n *Node) Create(path string, buffer []byte) error {
